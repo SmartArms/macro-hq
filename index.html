@@ -8,884 +8,266 @@
 <meta name="apple-mobile-web-app-title" content="Macro HQ">
 <title>Macro HQ</title>
 <style>
-:root {
-  --bg: #0a0a0a;
-  --card: #141414;
-  --card2: #1c1c1c;
-  --border: #262626;
-  --orange: #f97316;
-  --orange-dim: #7c2d12;
-  --green: #22c55e;
-  --green-dim: #14532d;
-  --blue: #60a5fa;
-  --blue-dim: #1e3a5f;
-  --yellow: #fbbf24;
-  --yellow-dim: #451a03;
-  --red: #f87171;
-  --red-dim: #450a0a;
-  --purple: #a78bfa;
-  --text: #fafafa;
-  --muted: #a3a3a3;
-  --dim: #404040;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-  min-height: 100vh;
-  overscroll-behavior: none;
-}
-
-/* NAV */
-.nav {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  background: rgba(14,14,14,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border);
-  display: flex;
-  padding-bottom: var(--safe-bottom);
-  z-index: 100;
-}
-.nav-btn {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 10px 4px 8px;
-  background: none; border: none; cursor: pointer;
-  gap: 4px; color: var(--dim);
-  transition: color 0.2s;
-}
-.nav-btn.active { color: var(--orange); }
-.nav-btn span { font-size: 20px; }
-.nav-btn label { font-size: 10px; font-weight: 700; letter-spacing: 0.3px; pointer-events: none; }
-
-/* PAGE */
-.page { display: none; padding: 0 0 90px; min-height: 100vh; }
-.page.active { display: block; }
-
-/* HEADER */
-.page-header {
-  padding: calc(var(--safe-top) + 20px) 20px 16px;
-  background: linear-gradient(180deg, var(--bg) 60%, transparent);
-  position: sticky; top: 0; z-index: 10;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-.page-label { font-size: 11px; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; margin-bottom: 4px; }
-.page-title { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
-.page-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-/* CONTENT */
-.content { padding: 0 16px; }
-
-/* CARDS */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 14px;
-}
-.card-label {
-  font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 14px; font-weight: 700;
-}
-
-/* DAY TOGGLE */
-.day-toggle {
-  display: flex; background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px; padding: 5px;
-  margin: 0 16px 16px;
-}
-.day-btn {
-  flex: 1; padding: 10px 8px;
-  border-radius: 12px; border: none; cursor: pointer;
-  font-size: 13px; font-weight: 800;
-  transition: all 0.25s cubic-bezier(.4,0,.2,1);
-  background: transparent; color: var(--muted);
-}
-.day-btn.active { background: var(--orange); color: white; }
-
-/* MACRO RINGS */
-.rings-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: 12px; margin-bottom: 14px;
-}
-.ring-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 20px; padding: 16px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
-}
-.ring-wrap { position: relative; width: 84px; height: 84px; }
-.ring-wrap svg { transform: rotate(-90deg); }
-.ring-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-}
-.ring-val { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
-.ring-unit { font-size: 10px; color: var(--muted); }
-.ring-info { text-align: center; width: 100%; }
-.ring-name { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
-.ring-target { font-size: 11px; color: var(--muted); }
-.ring-left { font-size: 11px; font-weight: 700; margin-top: 2px; }
-
-/* CALORIE BIG CARD */
-.cal-card {
-  background: linear-gradient(135deg, #1a0a00 0%, #0f0f0f 100%);
-  border: 1px solid var(--orange-dim);
-  border-radius: 20px; padding: 20px;
-  margin-bottom: 14px;
-}
-.cal-num {
-  font-size: 52px; font-weight: 900; letter-spacing: -3px;
-  color: var(--orange); line-height: 1;
-}
-.cal-unit { font-size: 16px; font-weight: 400; color: var(--muted); margin-left: 4px; }
-.cal-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
-
-/* DEFICIT METER */
-.deficit-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 20px; padding: 18px; margin-bottom: 14px;
-}
-.deficit-num {
-  font-size: 36px; font-weight: 900; letter-spacing: -1.5px;
-  margin-bottom: 4px;
-}
-.meter-track {
-  height: 10px; border-radius: 5px;
-  background: var(--border); position: relative;
-  overflow: hidden; margin: 12px 0 6px;
-}
-.meter-fill {
-  height: 100%; border-radius: 5px;
-  transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.3s;
-}
-.meter-labels {
-  display: flex; justify-content: space-between;
-  font-size: 10px; color: var(--dim); margin-bottom: 10px;
-}
-.deficit-status {
-  padding: 10px 14px; border-radius: 10px;
-  font-size: 13px; font-weight: 700; text-align: center;
-}
-
-/* INPUTS */
-.input-group { margin-bottom: 12px; }
-.input-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; display: block; }
-.input-field {
-  width: 100%; padding: 13px 16px;
-  background: var(--card2); border: 1px solid var(--border);
-  border-radius: 12px; color: var(--text);
-  font-size: 17px; font-weight: 700;
-  outline: none; -webkit-appearance: none;
-  transition: border-color 0.2s;
-}
-.input-field:focus { border-color: var(--orange); }
-.macro-input-row {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 10px;
-}
-.macro-dot {
-  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-}
-.macro-input-label { font-size: 13px; font-weight: 700; min-width: 64px; }
-.macro-pct {
-  font-size: 12px; font-weight: 800; min-width: 40px; text-align: right;
-}
-
-/* GOLDEN RULES */
-.rule-row {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-}
-.rule-row:last-child { border-bottom: none; padding-bottom: 0; }
-.rule-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-.rule-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-/* STRATEGY */
-.strategy-row {
-  display: flex; gap: 10px; align-items: flex-start;
-  padding: 10px 0; border-bottom: 1px solid var(--border);
-}
-.strategy-row:last-child { border-bottom: none; padding-bottom: 0; }
-.strategy-time {
-  font-size: 11px; font-weight: 800; padding: 3px 8px;
-  border-radius: 6px; white-space: nowrap; flex-shrink: 0;
-}
-.strategy-text { font-size: 13px; color: var(--muted); line-height: 1.5; padding-top: 2px; }
-
-/* SHORTCUTS */
-.shortcut-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 20px; padding: 18px; margin-bottom: 14px;
-}
-.shortcut-header {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-}
-.shortcut-icon {
-  width: 44px; height: 44px; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.shortcut-title { font-size: 17px; font-weight: 800; }
-.shortcut-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.action-step {
-  display: flex; gap: 12px; margin-bottom: 10px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--border);
-}
-.action-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.step-num {
-  width: 24px; height: 24px; border-radius: 50%;
-  background: var(--orange); color: white;
-  font-size: 12px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 1px;
-}
-.step-num.g { background: var(--green); color: black; }
-.step-num.b { background: var(--blue); color: black; }
-.action-content h4 { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-.action-content p { font-size: 12px; color: var(--muted); }
-.code-pill {
-  display: inline-block; background: var(--border);
-  color: var(--orange); padding: 2px 8px;
-  border-radius: 6px; font-size: 11px;
-  font-family: 'SF Mono', monospace; margin-top: 4px;
-  line-height: 1.8;
-}
-.code-pill.g { color: var(--green); }
-.code-pill.b { color: var(--blue); }
-
-/* TIP BOX */
-.tip-box {
-  background: var(--blue-dim); border: 1px solid #3b82f630;
-  border-radius: 12px; padding: 12px 14px;
-  font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 12px;
-}
-.tip-box strong { color: var(--blue); }
-
-/* HOW TO INSTALL */
-.install-card {
-  background: linear-gradient(135deg, #0f1f0f, #0a0a0a);
-  border: 1px solid var(--green-dim);
-  border-radius: 20px; padding: 18px; margin-bottom: 14px;
-}
-.install-step {
-  display: flex; gap: 12px; margin-bottom: 12px;
-}
-.install-num {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--green); color: black;
-  font-size: 13px; font-weight: 900;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.install-text h4 { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
-.install-text p { font-size: 12px; color: var(--muted); }
-
-/* FIBER TABLE */
-.fiber-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 9px 0; border-bottom: 1px solid var(--border);
-  font-size: 13px;
-}
-.fiber-row:last-child { border-bottom: none; }
-.fiber-g { font-weight: 800; color: var(--green); }
-.fiber-note { font-size: 11px; color: var(--dim); }
-
-/* WEEKLY TRACKER */
-.week-row {
-  display: flex; gap: 6px; margin-bottom: 10px; align-items: center;
-}
-.week-day { font-size: 12px; font-weight: 700; width: 32px; color: var(--muted); flex-shrink: 0; }
-.week-bar-track {
-  flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
-}
-.week-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
-.week-num { font-size: 11px; color: var(--muted); width: 40px; text-align: right; flex-shrink: 0; }
-
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.page.active .card,
-.page.active .cal-card,
-.page.active .deficit-card,
-.page.active .ring-card,
-.page.active .shortcut-card,
-.page.active .install-card {
-  animation: fadeUp 0.35s ease both;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0a0a0a;--card:#141414;--card2:#1c1c1c;--border:#262626;--orange:#f97316;--orange-dim:#7c2d12;--green:#22c55e;--green-dim:#14532d;--blue:#60a5fa;--blue-dim:#1e3a5f;--yellow:#fbbf24;--red:#f87171;--text:#fafafa;--muted:#a3a3a3;--dim:#404040}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif;min-height:100vh;overscroll-behavior:none}
+.nav{display:flex;border-top:1px solid var(--border);background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);position:fixed;bottom:0;left:0;right:0;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px 8px;background:none;border:none;cursor:pointer;gap:3px;color:var(--dim);transition:color 0.2s;font-family:inherit}
+.nav-btn.active{color:var(--orange)}
+.page{display:none;padding-bottom:90px;min-height:100vh}
+.page.active{display:block}
+.ph{padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 10px;border-bottom:1px solid var(--border);margin-bottom:14px;position:sticky;top:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);z-index:10}
+.ph-tag{font-size:10px;letter-spacing:2px;color:var(--orange);text-transform:uppercase;margin-bottom:3px;font-weight:600}
+.ph-title{font-size:24px;font-weight:800;letter-spacing:-0.5px}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.px{padding:0 14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}
+.clbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:600}
+.dtoggle{display:flex;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4px;margin:0 14px 12px}
+.dbtn{flex:1;padding:9px 6px;border-radius:10px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.2s;background:transparent;color:var(--muted);font-family:inherit}
+.dbtn.active{background:var(--orange);color:white}
+.rings{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.rw{position:relative;width:80px;height:80px}
+.rw svg{transform:rotate(-90deg)}
+.rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rv{font-size:17px;font-weight:800;letter-spacing:-0.5px}
+.ru{font-size:10px;color:var(--muted)}
+.ri{text-align:center;width:100%}
+.rn{font-size:13px;font-weight:700;margin-bottom:1px}
+.rt2{font-size:11px;color:var(--muted)}
+.rl{font-size:11px;font-weight:700;margin-top:2px}
+.cal-big{font-size:44px;font-weight:900;letter-spacing:-2px;color:var(--orange);line-height:1}
+.cal-sub{font-size:13px;color:var(--muted);margin-top:6px}
+.row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none;padding-bottom:0}
+.dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.rt3{font-size:13px;color:var(--muted);line-height:1.5}
+.ifield{width:100%;padding:12px 14px;background:var(--card2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:17px;font-weight:700;outline:none;font-family:inherit;margin-bottom:12px;-webkit-appearance:none;transition:border-color 0.2s}
+.ifield:focus{border-color:var(--orange)}
+.ifield.prefilled{border-color:var(--green)!important;background:#14532d33!important}
+.def-num{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+.mtrack{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin:10px 0 6px}
+.mfill{height:100%;border-radius:4px;transition:width 0.4s,background 0.3s}
+.mlbls{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:10px}
+.dstatus{padding:9px 12px;border-radius:10px;font-size:13px;font-weight:700;text-align:center;background:var(--border);color:var(--muted)}
+.mir{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mlbl{font-size:13px;font-weight:700;min-width:60px}
+.mpct{font-size:12px;font-weight:700;min-width:38px;text-align:right}
+.strow{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)}
+.strow:last-child{border-bottom:none;padding-bottom:0}
+.stt{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.sttx{font-size:13px;color:var(--muted);line-height:1.5;padding-top:2px}
+.frow{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.frow:last-child{border-bottom:none}
+.fg{font-weight:700;color:var(--green)}
+.fn{font-size:11px;color:var(--dim)}
+.prefill-banner{background:#14532d;border:1px solid var(--green);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--green);font-weight:700;margin-bottom:12px;display:none;align-items:center;gap:8px}
+.badge{display:none;align-items:center;background:#14532d;border:1px solid var(--green);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--green);font-weight:700;margin-left:8px}
 </style>
 </head>
 <body>
+<div id="app">
 
-<!-- PAGES -->
-
-<!-- PAGE 1: DASHBOARD -->
 <div class="page active" id="page-dashboard">
-  <div class="page-header">
-    <div class="page-label">Daily Reference</div>
-    <div class="page-title">Macro HQ 💪</div>
-    <div class="page-sub">Your personal nutrition command centre</div>
-  </div>
-
-  <div class="day-toggle">
-    <button class="day-btn active" onclick="setDay('training', this)">🏋️ Training Day</button>
-    <button class="day-btn" onclick="setDay('rest', this)">💤 Rest Day</button>
-    <button class="day-btn" onclick="setDay('saturday', this)">🏋️ Saturday</button>
-  </div>
-
-  <div class="content">
-    <!-- Calorie Target -->
-    <div class="cal-card">
-      <div class="card-label" style="color:var(--orange)">Daily Calorie Target</div>
-      <div>
-        <span class="cal-num" id="cal-target">2,500</span>
-        <span class="cal-unit">kcal</span>
-      </div>
-      <div class="cal-sub" id="cal-sub">~750 deficit from ~3,300 TDEE on training days</div>
+  <div class="ph">
+    <div class="ph-tag">Daily Reference</div>
+    <div style="display:flex;align-items:center">
+      <div class="ph-title">Macro HQ</div>
+      <span class="badge" id="live-badge">Live</span>
     </div>
-
-    <!-- Macro Rings -->
-    <div class="rings-grid" id="rings-grid"></div>
-
-    <!-- Golden Rules -->
-    <div class="card">
-      <div class="card-label">Golden Rules — Never Break</div>
-      <div class="rule-row"><div class="rule-dot" style="background:var(--orange)"></div><div class="rule-text">Protein 170g+ every single day — training OR rest</div></div>
-      <div class="rule-row"><div class="rule-dot" style="background:var(--red)"></div><div class="rule-text">Never eat below 1,450 kcal — muscle protection</div></div>
-      <div class="rule-row"><div class="rule-dot" style="background:var(--green)"></div><div class="rule-text">Deficit must be 500–1,000 kcal — no more, no less</div></div>
-      <div class="rule-row"><div class="rule-dot" style="background:var(--blue)"></div><div class="rule-text">Carbs higher on train days, lower on rest days</div></div>
-      <div class="rule-row"><div class="rule-dot" style="background:var(--yellow)"></div><div class="rule-text">Sleep 7–8 hrs — muscles rebuild only during sleep</div></div>
+    <div class="ph-sub">Your nutrition command centre</div>
+  </div>
+  <div class="dtoggle">
+    <button class="dbtn active" onclick="setDay('training',this)">Weights</button>
+    <button class="dbtn" onclick="setDay('rest',this)">Rest</button>
+    <button class="dbtn" onclick="setDay('saturday',this)">Saturday</button>
+  </div>
+  <div class="px">
+    <div class="card" style="border-left:3px solid var(--orange)">
+      <div class="clbl" style="color:var(--orange)">Daily calorie target</div>
+      <div class="cal-big" id="d-cal">2,500</div>
+      <div class="cal-sub" id="d-calsub">~750 deficit from ~3,300 TDEE on training days</div>
     </div>
-
-    <!-- Fiber Sources -->
+    <div class="rings" id="d-rings"></div>
     <div class="card">
-      <div class="card-label" style="color:var(--green)">🌿 Easy Fiber Sources</div>
-      <div class="fiber-row"><span>Oats 80g</span><span class="fiber-g">8g</span><span class="fiber-note">Breakfast</span></div>
-      <div class="fiber-row"><span>Broccoli 1 cup</span><span class="fiber-g">5g</span><span class="fiber-note">Any meal</span></div>
-      <div class="fiber-row"><span>Sweet potato 150g</span><span class="fiber-g">4g</span><span class="fiber-note">Dinner side</span></div>
-      <div class="fiber-row"><span>Dal/Lentils 100g</span><span class="fiber-g">8g</span><span class="fiber-note">Lunch add-on</span></div>
-      <div class="fiber-row"><span>Banana 1</span><span class="fiber-g">3g</span><span class="fiber-note">Pre-workout</span></div>
-      <div class="fiber-row"><span>Greek yogurt 170g</span><span class="fiber-g">0g</span><span class="fiber-note">Protein only</span></div>
+      <div class="clbl">Golden rules</div>
+      <div class="row"><div class="dot" style="background:var(--orange)"></div><div class="rt3">Protein 170g+ every day — training or rest</div></div>
+      <div class="row"><div class="dot" style="background:var(--red)"></div><div class="rt3">Never eat below 1,450 kcal — muscle protection</div></div>
+      <div class="row"><div class="dot" style="background:var(--green)"></div><div class="rt3">Deficit must be 500–1,000 kcal daily</div></div>
+      <div class="row"><div class="dot" style="background:var(--blue)"></div><div class="rt3">Carbs higher on train days, lower on rest days</div></div>
+      <div class="row"><div class="dot" style="background:var(--yellow)"></div><div class="rt3">Sleep 7–8 hrs — muscles rebuild during sleep</div></div>
+    </div>
+    <div class="card">
+      <div class="clbl" style="color:var(--green)">Fiber sources (target 28–30g/day)</div>
+      <div class="frow"><span>Oats 80g</span><span class="fg">8g</span><span class="fn">Breakfast</span></div>
+      <div class="frow"><span>Dal/Lentils 100g</span><span class="fg">8g</span><span class="fn">Lunch</span></div>
+      <div class="frow"><span>Broccoli 1 cup</span><span class="fg">5g</span><span class="fn">Any meal</span></div>
+      <div class="frow"><span>Sweet potato 150g</span><span class="fg">4g</span><span class="fn">Dinner side</span></div>
+      <div class="frow"><span>Banana 1</span><span class="fg">3g</span><span class="fn">Pre-workout</span></div>
     </div>
   </div>
 </div>
 
-<!-- PAGE 2: LOG TODAY -->
 <div class="page" id="page-log">
-  <div class="page-header">
-    <div class="page-label">Track Your Day</div>
-    <div class="page-title">Log Today</div>
-    <div class="page-sub">Enter your Garmin numbers</div>
+  <div class="ph">
+    <div class="ph-tag">Track Today</div>
+    <div style="display:flex;align-items:center">
+      <div class="ph-title">Log Today</div>
+      <span class="badge" id="log-badge">Pre-filled</span>
+    </div>
+    <div class="ph-sub" id="log-sub">Enter numbers from Apple Health</div>
   </div>
-
-  <div class="content">
-    <!-- Inputs -->
+  <div class="px">
+    <div class="prefill-banner" id="prefill-banner">✅ Data loaded from Apple Health via Shortcut</div>
     <div class="card">
-      <div class="card-label">Today's Numbers</div>
-      <div class="input-group">
-        <label class="input-label">Garmin TDEE (kcal burned)</label>
-        <input class="input-field" type="number" id="in-tdee" placeholder="e.g. 3300" inputmode="numeric" oninput="recalc()">
-      </div>
-      <div class="input-group">
-        <label class="input-label">Total Calories Eaten</label>
-        <input class="input-field" type="number" id="in-cal" placeholder="e.g. 1859" inputmode="numeric" oninput="recalc()">
-      </div>
+      <div class="clbl">Calories burned vs eaten</div>
+      <label style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;display:block">Total calories burned today (TDEE)</label>
+      <input class="ifield" type="number" id="in-tdee" placeholder="e.g. 3300" inputmode="numeric" oninput="recalc()">
+      <label style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;display:block">Total calories eaten today</label>
+      <input class="ifield" type="number" id="in-cal" placeholder="e.g. 1859" inputmode="numeric" oninput="recalc()" style="margin-bottom:0">
     </div>
-
-    <!-- Deficit Meter -->
-    <div class="deficit-card">
-      <div class="card-label">Calorie Deficit</div>
-      <div class="deficit-num" id="def-num">— kcal</div>
-      <div class="meter-track">
-        <div class="meter-fill" id="def-fill" style="width:0%;background:var(--dim)"></div>
-      </div>
-      <div class="meter-labels">
-        <span>0</span><span style="color:var(--orange)">500</span><span style="color:var(--green)">750</span><span style="color:var(--red)">1000</span>
-      </div>
-      <div class="deficit-status" id="def-status" style="background:var(--border);color:var(--muted)">
-        Enter your TDEE and calories eaten above
-      </div>
-    </div>
-
-    <!-- Macro Inputs -->
     <div class="card">
-      <div class="card-label">Macros from Garmin</div>
+      <div class="clbl">Calorie deficit</div>
+      <div class="def-num" id="def-num" style="color:var(--muted)">— kcal</div>
+      <div class="mtrack"><div class="mfill" id="def-fill" style="width:0%"></div></div>
+      <div class="mlbls"><span>0</span><span style="color:var(--orange)">500</span><span style="color:var(--green)">750</span><span style="color:var(--red)">1000</span></div>
+      <div class="dstatus" id="def-status">Enter TDEE and calories eaten above</div>
+    </div>
+    <div class="card">
+      <div class="clbl">Macros from Apple Health</div>
       <div id="macro-inputs"></div>
     </div>
-
-    <!-- Progress Rings -->
-    <div id="progress-section" style="display:none">
-      <div class="card-label" style="padding:0 4px;margin-bottom:10px">Today's Progress</div>
-      <div class="rings-grid" id="progress-rings"></div>
+    <div id="prog-section" style="display:none">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:600;padding:0 4px">Progress today</div>
+      <div class="rings" id="prog-rings"></div>
     </div>
-
-    <!-- Deficit Strategy -->
-    <div class="card" style="background:var(--blue-dim);border-color:#3b82f630">
-      <div class="card-label" style="color:var(--blue)">⚡ Deficit Strategy</div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:#1e3a5f;color:var(--blue)">Morning</div>
-        <div class="strategy-text">Use yesterday's TDEE as today's estimate</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--orange-dim);color:var(--orange)">By 1pm</div>
-        <div class="strategy-text">Eat 60–65% of estimated calories</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--yellow-dim);color:var(--yellow)">Afternoon</div>
-        <div class="strategy-text">Check Garmin burn — adjust snack size</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--green-dim);color:var(--green)">Dinner</div>
-        <div class="strategy-text">TDEE mostly finalised — set dinner to land 500–750 deficit</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--orange-dim);color:var(--orange)">Bedtime</div>
-        <div class="strategy-text">Log final numbers here — compare to target</div>
-      </div>
+    <div class="card" style="background:#1e3a5f33;border-color:var(--blue-dim)">
+      <div class="clbl" style="color:var(--blue)">Deficit strategy</div>
+      <div class="strow"><div class="stt" style="background:var(--border);color:var(--muted)">Morning</div><div class="sttx">Run Shortcut — Apple Health pre-fills everything</div></div>
+      <div class="strow"><div class="stt" style="background:var(--border);color:var(--orange)">By 1pm</div><div class="sttx">Run Shortcut again — see updated deficit live</div></div>
+      <div class="strow"><div class="stt" style="background:var(--border);color:var(--yellow)">Afternoon</div><div class="sttx">Run Shortcut — adjust snack based on meter</div></div>
+      <div class="strow"><div class="stt" style="background:var(--border);color:var(--green)">Dinner</div><div class="sttx">Final run — land 500–750 deficit</div></div>
     </div>
   </div>
 </div>
 
-<!-- PAGE 3: STRATEGY -->
 <div class="page" id="page-strategy">
-  <div class="page-header">
-    <div class="page-label">Meal Timing</div>
-    <div class="page-title">Day Strategy</div>
-    <div class="page-sub">Meal by meal plan for each day type</div>
+  <div class="ph"><div class="ph-tag">Meal timing</div><div class="ph-title">Day Strategy</div><div class="ph-sub">Your meal plan by day type</div></div>
+  <div class="dtoggle">
+    <button class="dbtn active" onclick="setStrat('training',this)">Weights</button>
+    <button class="dbtn" onclick="setStrat('rest',this)">Rest</button>
+    <button class="dbtn" onclick="setStrat('saturday',this)">Saturday</button>
   </div>
-
-  <div class="day-toggle" style="margin-top:0">
-    <button class="day-btn active" onclick="setStratDay('training', this)">🏋️ Training</button>
-    <button class="day-btn" onclick="setStratDay('rest', this)">💤 Rest</button>
-    <button class="day-btn" onclick="setStratDay('saturday', this)">🏋️ Saturday</button>
-  </div>
-
-  <div class="content">
+  <div class="px">
     <div class="card" id="strat-meals"></div>
-    <div class="card" id="strat-schedule"></div>
+    <div class="card" id="strat-reminders"></div>
   </div>
 </div>
 
-<!-- PAGE 4: SHORTCUTS -->
 <div class="page" id="page-shortcuts">
-  <div class="page-header">
-    <div class="page-label">Apple Integration</div>
-    <div class="page-title">Shortcuts Setup</div>
-    <div class="page-sub">Log macros directly into Apple Health</div>
-  </div>
-
-  <div class="content">
-
-    <!-- How to Install THIS App -->
-    <div class="install-card">
-      <div class="card-label" style="color:var(--green)">📱 Save This App to Home Screen</div>
-      <div class="install-step">
-        <div class="install-num">1</div>
-        <div class="install-text"><h4>Open in Safari</h4><p>Make sure you're viewing this in Safari (not Chrome)</p></div>
+  <div class="ph"><div class="ph-tag">Apple Health Bridge</div><div class="ph-title">Shortcut Setup</div><div class="ph-sub">One tap — Apple Health fills Macro HQ</div></div>
+  <div class="px">
+    <div class="card" style="border-left:3px solid var(--green)">
+      <div class="clbl" style="color:var(--green)">Your Macro HQ URL for Shortcut</div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:11px;font-family:monospace;color:var(--muted);word-break:break-all;line-height:1.8;margin-bottom:10px">
+        https://smartarms.github.io/macro-hq/?tdee=<span style="color:var(--green)">[TDEE]</span>&cal=<span style="color:var(--green)">[CalEaten]</span>&protein=<span style="color:var(--green)">[Protein]</span>&carbs=<span style="color:var(--green)">[Carbs]</span>&fat=<span style="color:var(--green)">[Fat]</span>&fiber=<span style="color:var(--green)">[Fiber]</span>
       </div>
-      <div class="install-step">
-        <div class="install-num">2</div>
-        <div class="install-text"><h4>Tap Share Button</h4><p>The box with arrow icon at the bottom of Safari</p></div>
-      </div>
-      <div class="install-step">
-        <div class="install-num">3</div>
-        <div class="install-text"><h4>Add to Home Screen</h4><p>Scroll down in share sheet → tap "Add to Home Screen"</p></div>
-      </div>
-      <div class="install-step">
-        <div class="install-num">4</div>
-        <div class="install-text"><h4>Name it "Macro HQ"</h4><p>Tap Add → icon appears on your home screen ✅</p></div>
-      </div>
+      <div style="font-size:12px;color:var(--muted)">Replace each [VARIABLE] with the actual variable pill from your Shortcut</div>
     </div>
-
-    <!-- Shortcut 1 -->
-    <div class="shortcut-card">
-      <div class="shortcut-header">
-        <div class="shortcut-icon" style="background:#431407">🍽️</div>
-        <div>
-          <div class="shortcut-title">Log Meal</div>
-          <div class="shortcut-desc">Logs macros directly into Apple Health</div>
-        </div>
-      </div>
-      <div class="action-step"><div class="step-num">1</div><div class="action-content"><h4>Ask for Input — Meal Name</h4><p>Type: Text</p><div class="code-pill">Prompt: "What meal? (Breakfast/Lunch/Dinner)"</div></div></div>
-      <div class="action-step"><div class="step-num">2</div><div class="action-content"><h4>Ask for Input — Calories</h4><p>Type: Number → Variable: Calories</p><div class="code-pill">Prompt: "Calories (kcal)?"</div></div></div>
-      <div class="action-step"><div class="step-num">3</div><div class="action-content"><h4>Ask for Input — Protein</h4><p>Type: Number → Variable: Protein</p><div class="code-pill">Prompt: "Protein (g)?"</div></div></div>
-      <div class="action-step"><div class="step-num">4</div><div class="action-content"><h4>Ask for Input — Carbs</h4><p>Type: Number → Variable: Carbs</p><div class="code-pill">Prompt: "Carbs (g)?"</div></div></div>
-      <div class="action-step"><div class="step-num">5</div><div class="action-content"><h4>Ask for Input — Fat</h4><p>Type: Number → Variable: Fat</p><div class="code-pill">Prompt: "Fat (g)?"</div></div></div>
-      <div class="action-step"><div class="step-num">6</div><div class="action-content"><h4>Ask for Input — Fiber</h4><p>Type: Number → Variable: Fiber</p><div class="code-pill">Prompt: "Fiber (g)?"</div></div></div>
-      <div class="action-step"><div class="step-num">7</div><div class="action-content"><h4>Log Health Sample × 5</h4><p>Repeat for each macro below:</p>
-        <div class="code-pill">Dietary Energy → Calories kcal</div><br>
-        <div class="code-pill">Protein → Protein g</div><br>
-        <div class="code-pill">Carbohydrates → Carbs g</div><br>
-        <div class="code-pill">Total Fat → Fat g</div><br>
-        <div class="code-pill">Dietary Fiber → Fiber g</div>
-      </div></div>
-      <div class="action-step"><div class="step-num">8</div><div class="action-content"><h4>Show Notification</h4><div class="code-pill">✅ [MealName] logged to Apple Health!</div></div></div>
-      <div class="tip-box"><strong>💡 Tip:</strong> Add to Home Screen → name "Log Meal" → one tap after every meal. Allow Health permissions first time.</div>
-    </div>
-
-    <!-- Shortcut 2 -->
-    <div class="shortcut-card">
-      <div class="shortcut-header">
-        <div class="shortcut-icon" style="background:var(--green-dim)">📊</div>
-        <div>
-          <div class="shortcut-title">Check My Deficit</div>
-          <div class="shortcut-desc">Reads Apple Health + Garmin TDEE → shows deficit zone</div>
-        </div>
-      </div>
-      <div class="action-step"><div class="step-num g">1</div><div class="action-content"><h4>Find Health Samples</h4><p>Type: Dietary Energy → Date: Today</p><div class="code-pill g">Variable: TodayCalories</div></div></div>
-      <div class="action-step"><div class="step-num g">2</div><div class="action-content"><h4>Calculate Statistics</h4><p>Input: TodayCalories → Statistic: Sum</p><div class="code-pill g">Variable: TotalEaten</div></div></div>
-      <div class="action-step"><div class="step-num g">3</div><div class="action-content"><h4>Ask for Input — TDEE</h4><div class="code-pill g">Prompt: "Enter Garmin TDEE for today"</div><div class="code-pill g">Variable: TDEE</div></div></div>
-      <div class="action-step"><div class="step-num g">4</div><div class="action-content"><h4>Calculate Deficit</h4><div class="code-pill g">TDEE − TotalEaten = Deficit</div></div></div>
-      <div class="action-step"><div class="step-num g">5</div><div class="action-content"><h4>If/Otherwise Conditions</h4>
-        <div class="code-pill g">If Deficit > 1000 → "⚠️ Too aggressive!"</div><br>
-        <div class="code-pill g">If Deficit 500–1000 → "✅ Perfect zone!"</div><br>
-        <div class="code-pill g">If Deficit 0–500 → "⚡ Too small"</div><br>
-        <div class="code-pill g">Otherwise → "🚨 Eating more than burning!"</div>
-      </div></div>
-      <div class="action-step"><div class="step-num g">6</div><div class="action-content"><h4>Show Summary Alert</h4><div class="code-pill g">TDEE: [TDEE] | Eaten: [TotalEaten] | Deficit: [Deficit]</div></div></div>
-      <div class="tip-box" style="background:#14532d22;border-color:#22c55e30"><strong style="color:var(--green)">💡 Best time to run:</strong> Before dinner — know exactly how much to eat tonight to stay in the 500–750 deficit zone.</div>
-    </div>
-
-    <!-- Shortcut 3 -->
-    <div class="shortcut-card">
-      <div class="shortcut-header">
-        <div class="shortcut-icon" style="background:var(--blue-dim)">🎯</div>
-        <div>
-          <div class="shortcut-title">Today's Targets</div>
-          <div class="shortcut-desc">Quick macro reference by day type</div>
-        </div>
-      </div>
-      <div class="action-step"><div class="step-num b">1</div><div class="action-content"><h4>Choose from Menu</h4>
-        <div class="code-pill b">Prompt: "What type of day?"</div><br>
-        <div class="code-pill b">Option 1: 🏋️ Training Day</div><br>
-        <div class="code-pill b">Option 2: 💤 Rest Day</div><br>
-        <div class="code-pill b">Option 3: 🏋️ Saturday</div>
-      </div></div>
-      <div class="action-step"><div class="step-num b">2</div><div class="action-content"><h4>Show Alert — Training Day</h4>
-        <div class="code-pill b">Calories: 2,400–2,550 kcal</div><br>
-        <div class="code-pill b">Protein: 175g | Carbs: 210g</div><br>
-        <div class="code-pill b">Fat: 68g | Fiber: 30g</div><br>
-        <div class="code-pill b">Creatine: 5g post workout</div>
-      </div></div>
-      <div class="action-step"><div class="step-num b">3</div><div class="action-content"><h4>Show Alert — Rest Day</h4>
-        <div class="code-pill b">Calories: 1,750 kcal</div><br>
-        <div class="code-pill b">Protein: 155g | Carbs: 150g</div><br>
-        <div class="code-pill b">Fat: 62g | Fiber: 28g</div><br>
-        <div class="code-pill b">Walk: 20–30 mins recovery</div>
-      </div></div>
-      <div class="action-step"><div class="step-num b">4</div><div class="action-content"><h4>Show Alert — Saturday</h4>
-        <div class="code-pill b">Calories: 2,400–2,550 kcal</div><br>
-        <div class="code-pill b">Wake: 6am | Gym: 7am Community</div><br>
-        <div class="code-pill b">Sleep: 10pm (8 hrs tonight!)</div>
-      </div></div>
-      <div class="tip-box" style="background:#1e3a5f22;border-color:#60a5fa30"><strong style="color:var(--blue)">🎙️ Siri tip:</strong> Name this shortcut "Today's Targets" → say "Hey Siri, Today's Targets" without unlocking phone!</div>
-    </div>
-
-    <!-- Where to see in Apple Health -->
     <div class="card">
-      <div class="card-label" style="color:var(--green)">Where to See Data in Apple Health</div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--green-dim);color:var(--green)">Step 1</div>
-        <div class="strategy-text">Open Apple Health → Browse tab</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--green-dim);color:var(--green)">Step 2</div>
-        <div class="strategy-text">Tap Nutrition → see all logged macros</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--green-dim);color:var(--green)">Step 3</div>
-        <div class="strategy-text">Pin favourites — Calories, Protein, Carbs, Fat, Fiber</div>
-      </div>
-      <div class="strategy-row">
-        <div class="strategy-time" style="background:var(--green-dim);color:var(--green)">Step 4</div>
-        <div class="strategy-text">Garmin Connect → Settings → Connected Apps → Apple Health → ON</div>
-      </div>
+      <div class="clbl" style="color:var(--orange)">Shortcut action order</div>
+      <div class="strow"><div class="stt" style="background:#f9731622;color:var(--orange)">1–2</div><div class="sttx">Find Active Energy + Resting Energy → Sum each → Set Variables</div></div>
+      <div class="strow"><div class="stt" style="background:#f9731622;color:var(--orange)">3</div><div class="sttx">Calculate: ActiveEnergy + RestingEnergy → Set Variable: TDEE</div></div>
+      <div class="strow"><div class="stt" style="background:#f9731622;color:var(--orange)">4</div><div class="sttx">Find Dietary Energy → Sum → Set Variable: CalEaten</div></div>
+      <div class="strow"><div class="stt" style="background:#f9731622;color:var(--orange)">5–8</div><div class="sttx">Find Protein, Carbs, Fat, Fiber → Sum each → Set Variables</div></div>
+      <div class="strow"><div class="stt" style="background:#22c55e22;color:var(--green)">9–14</div><div class="sttx">Round all 6 variables to whole numbers</div></div>
+      <div class="strow"><div class="stt" style="background:#60a5fa22;color:var(--blue)">15</div><div class="sttx">Text action — build URL with all variables</div></div>
+      <div class="strow"><div class="stt" style="background:#60a5fa22;color:var(--blue)">16</div><div class="sttx">Open URLs — input: Text from step 15</div></div>
     </div>
-
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
 <nav class="nav">
-  <button class="nav-btn active" onclick="showPage('dashboard', this)">
-    <span>📊</span><label>Targets</label>
-  </button>
-  <button class="nav-btn" onclick="showPage('log', this)">
-    <span>✏️</span><label>Log</label>
-  </button>
-  <button class="nav-btn" onclick="showPage('strategy', this)">
-    <span>⚡</span><label>Strategy</label>
-  </button>
-  <button class="nav-btn" onclick="showPage('shortcuts', this)">
-    <span>🔗</span><label>Shortcuts</label>
-  </button>
+  <button class="nav-btn active" onclick="showPage('dashboard',this)"><span style="font-size:18px">📊</span><span style="font-size:10px;font-weight:700">Targets</span></button>
+  <button class="nav-btn" onclick="showPage('log',this)"><span style="font-size:18px">✏️</span><span style="font-size:10px;font-weight:700">Log</span></button>
+  <button class="nav-btn" onclick="showPage('strategy',this)"><span style="font-size:18px">⚡</span><span style="font-size:10px;font-weight:700">Strategy</span></button>
+  <button class="nav-btn" onclick="showPage('shortcuts',this)"><span style="font-size:18px">🔗</span><span style="font-size:10px;font-weight:700">Shortcuts</span></button>
 </nav>
+</div>
 
 <script>
-// ---- DATA ----
-const TARGETS = {
-  training: { calories: 2500, protein: 175, carbs: 210, fat: 68, fiber: 30,
-    sub: '~750 deficit from ~3,300 TDEE on training days' },
-  rest:     { calories: 1750, protein: 155, carbs: 150, fat: 62, fiber: 28,
-    sub: '~420 deficit from ~1,871 TDEE on rest days' },
-  saturday: { calories: 2500, protein: 175, carbs: 210, fat: 68, fiber: 30,
-    sub: '7am Community Gym · Sleep 10pm · 8 hrs tonight!' }
-};
+const T={training:{cal:2500,sub:'~750 deficit from ~3,300 TDEE on training days',p:175,c:210,f:68,fi:30},rest:{cal:1750,sub:'~420 deficit from ~1,871 TDEE on rest days',p:155,c:150,f:62,fi:28},saturday:{cal:2500,sub:'7am Community Gym · Sleep 10pm · 8 hrs tonight!',p:175,c:210,f:68,fi:30}};
+const M=[{k:'protein',l:'Protein',col:'#f97316'},{k:'carbs',l:'Carbs',col:'#60a5fa'},{k:'fat',l:'Fat',col:'#fbbf24'},{k:'fiber',l:'Fiber',col:'#22c55e'}];
+const S={training:{meals:[['4:15am','2 dates + espresso (~136 kcal)','#f97316'],['5:00am','Train hard — 500ml water per hour','#f87171'],['6:35am','Whey + Creatine immediately after training','#22c55e'],['7:00am','Breakfast — 650 kcal | 50g protein','#60a5fa'],['12:30pm','Lunch — 700 kcal | 55g protein | carbs ok','#f97316'],['4:00pm','Afternoon — 500 kcal | 35g protein','#fbbf24'],['7:00pm','Dinner — 550 kcal | 40g protein | low carb','#60a5fa'],['9:00pm','Lights out — 7 hrs sleep','#a78bfa']],rem:[['4:00am','Wake up + 500ml water','#60a5fa'],['Dates first','Then espresso 45 mins before training','#f97316'],['Night before','Decide train or rest. Set 4am alarm.','#fbbf24']]},rest:{meals:[['7:00am','Breakfast — 500 kcal | 40g protein | no oats','#60a5fa'],['12:30pm','Lunch — 550 kcal | 50g protein | lean','#f97316'],['4:00pm','Afternoon — 300 kcal | 25g protein | light','#fbbf24'],['6:00pm','Walk 20–30 mins active recovery','#22c55e'],['7:00pm','Dinner — 400 kcal | 35g protein | min carbs','#60a5fa'],['9:00pm','Lights out — 7 hrs sleep','#a78bfa']],rem:[['5:30am','Wake up — no rush today','#60a5fa'],['Lower carbs','Same high protein as always','#f97316'],['Night before','Decide tomorrow. Set correct alarm.','#fbbf24']]},saturday:{meals:[['6:15am','2 dates + espresso (~136 kcal)','#f97316'],['7:00am','Community Gym — train hard','#f87171'],['8:35am','Whey + Creatine immediately','#22c55e'],['9:00am','Breakfast — 650 kcal | 50g protein','#60a5fa'],['1:00pm','Chettinad Pepper Chicken + rice','#f97316'],['4:30pm','Afternoon — 500 kcal | 35g protein','#fbbf24'],['7:00pm','Dinner — 550 kcal | 40g protein','#60a5fa'],['10:00pm','Lights out — 8 hrs tonight!','#a78bfa']],rem:[['6:00am','Wake up + 500ml water','#60a5fa'],['6:15am','Dates then espresso','#f97316'],['Friday night','Set 6am alarm. Pre-pack breakfast.','#fbbf24']]}};
+let cday='training',cstrat='training';
 
-const MACROS = [
-  { key:'protein', label:'Protein', color:'#f97316' },
-  { key:'carbs',   label:'Carbs',   color:'#60a5fa' },
-  { key:'fat',     label:'Fat',     color:'#fbbf24' },
-  { key:'fiber',   label:'Fiber',   color:'#22c55e' },
-];
+function showPage(id,btn){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');btn.classList.add('active')}
 
-const STRATEGIES = {
-  training: {
-    meals: [
-      { time:'4:15am', text:'Pre-workout — 2 dates + espresso (~136 kcal)', c:'#f97316' },
-      { time:'5:00am', text:'Train 🏋️ — 500ml water per hour', c:'#f87171' },
-      { time:'6:35am', text:'Whey + Creatine shake immediately after', c:'#22c55e' },
-      { time:'7:00am', text:'Breakfast — 650 kcal | 50g protein (most important)', c:'#60a5fa' },
-      { time:'12:30pm',text:'Lunch — 700 kcal | 55g protein | carbs ok here', c:'#f97316' },
-      { time:'4:00pm', text:'Afternoon — 500 kcal | 35g protein', c:'#fbbf24' },
-      { time:'7:00pm', text:'Dinner — 550 kcal | 40g protein | low carb', c:'#60a5fa' },
-      { time:'9:00pm', text:'Lights out 😴 — 7 hrs sleep', c:'#a78bfa' },
-    ],
-    schedule: [
-      { time:'4:00am', text:'Wake up + 500ml water', c:'#60a5fa' },
-      { time:'4:15am', text:'Dates first 🌴 then espresso ☕', c:'#f97316' },
-      { time:'5:00am', text:'Train hard 🏋️', c:'#f87171' },
-      { time:'Night before', text:'Decide train or rest. Set alarm. Pre-pack breakfast.', c:'#fbbf24' },
-    ]
-  },
-  rest: {
-    meals: [
-      { time:'7:00am', text:'Breakfast — 500 kcal | 40g protein | no oats today', c:'#60a5fa' },
-      { time:'12:30pm',text:'Lunch — 550 kcal | 50g protein | lean + clean', c:'#f97316' },
-      { time:'4:00pm', text:'Afternoon — 300 kcal | 25g protein | light snack', c:'#fbbf24' },
-      { time:'6:00pm', text:'Walk 🚶 — 20–30 mins active recovery', c:'#22c55e' },
-      { time:'7:00pm', text:'Dinner — 400 kcal | 35g protein | minimal carbs', c:'#60a5fa' },
-      { time:'9:00pm', text:'Lights out 😴 — 7 hrs sleep', c:'#a78bfa' },
-    ],
-    schedule: [
-      { time:'5:30am', text:'Wake up + 500ml water — no rush today', c:'#60a5fa' },
-      { time:'Anytime', text:'Lower carbs, same high protein', c:'#f97316' },
-      { time:'Evening', text:'Walk instead of training — muscles still recovering', c:'#22c55e' },
-      { time:'Night before', text:'Decide train or rest. Set alarm. Decide now!', c:'#fbbf24' },
-    ]
-  },
-  saturday: {
-    meals: [
-      { time:'6:15am', text:'Pre-workout — 2 dates + espresso (~136 kcal)', c:'#f97316' },
-      { time:'7:00am', text:'Community Gym 🏋️ — train hard', c:'#f87171' },
-      { time:'8:35am', text:'Whey + Creatine shake immediately', c:'#22c55e' },
-      { time:'9:00am', text:'Breakfast — 650 kcal | 50g protein', c:'#60a5fa' },
-      { time:'1:00pm', text:'Lunch — Chettinad Pepper Chicken 🟤 + rice', c:'#f97316' },
-      { time:'4:30pm', text:'Afternoon — 500 kcal | 35g protein', c:'#fbbf24' },
-      { time:'7:00pm', text:'Dinner — 550 kcal | 40g protein | low carb', c:'#60a5fa' },
-      { time:'10:00pm',text:'Lights out 😴 — 8 hrs tonight!', c:'#a78bfa' },
-    ],
-    schedule: [
-      { time:'6:00am', text:'Wake up + 500ml water', c:'#60a5fa' },
-      { time:'6:15am', text:'Dates first 🌴 then espresso ☕', c:'#f97316' },
-      { time:'7:00am', text:'Community gym 🏋️', c:'#f87171' },
-      { time:'Friday night', text:'Decide Saturday plan. Set 6am alarm. Pre-pack breakfast.', c:'#fbbf24' },
-    ]
+function ring(val,max,color,label){const p=Math.min(val/max,1),r=32,ci=2*Math.PI*r,d=p*ci,ov=val>max,fc=ov?'#f87171':color,lft=ov?'+'+(val-max)+' over':(max-val)+' left',lc=ov?'#f87171':val/max>.85?'#22c55e':val/max>.5?'#fbbf24':'#404040';return`<div class="rcard"><div class="rw"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="${r}" fill="none" stroke="#262626" stroke-width="7"/><circle cx="40" cy="40" r="${r}" fill="none" stroke="${fc}" stroke-width="7" stroke-dasharray="${d} ${ci}" stroke-linecap="round" style="transition:stroke-dasharray 0.4s"/></svg><div class="rc"><span class="rv" style="color:${fc}">${val}</span><span class="ru">g</span></div></div><div class="ri"><div class="rn" style="color:#fafafa">${label}</div><div class="rt2">Target: ${max}g</div><div class="rl" style="color:${lc}">${val>0?lft:'—'}</div></div></div>`}
+
+function setDay(type,btn){cday=type;btn.parentElement.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDash()}
+function renderDash(){const t=T[cday];document.getElementById('d-cal').textContent=t.cal.toLocaleString();document.getElementById('d-calsub').textContent=t.sub;document.getElementById('d-rings').innerHTML=M.map(m=>ring(0,t[m.k==='protein'?'p':m.k==='carbs'?'c':m.k==='fat'?'f':'fi'],m.col,m.l)).join('')}
+function setStrat(type,btn){cstrat=type;btn.parentElement.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderStrat()}
+function renderStrat(){const s=S[cstrat];document.getElementById('strat-meals').innerHTML='<div class="clbl">Meal plan</div>'+s.meals.map(m=>`<div class="strow"><div class="stt" style="background:${m[2]}22;color:${m[2]}">${m[0]}</div><div class="sttx">${m[1]}</div></div>`).join('');document.getElementById('strat-reminders').innerHTML='<div class="clbl">Key reminders</div>'+s.rem.map(m=>`<div class="strow"><div class="stt" style="background:${m[2]}22;color:${m[2]}">${m[0]}</div><div class="sttx">${m[1]}</div></div>`).join('')}
+function renderMacroInputs(){document.getElementById('macro-inputs').innerHTML=M.map(m=>`<div class="mir"><div class="mdot" style="background:${m.col}"></div><div class="mlbl" style="color:${m.col}">${m.l}</div><input class="ifield" style="flex:1;font-size:15px;padding:10px 12px;margin-bottom:0" type="number" inputmode="numeric" id="in-${m.k}" placeholder="g" oninput="recalc()"><div class="mpct" id="pct-${m.k}" style="color:#404040">—</div></div>`).join('')}
+
+function recalc(){
+  const tdee=parseInt(document.getElementById('in-tdee').value)||0,cal=parseInt(document.getElementById('in-cal').value)||0,def=tdee-cal;
+  const dn=document.getElementById('def-num'),df=document.getElementById('def-fill'),ds=document.getElementById('def-status');
+  if(tdee&&cal){
+    dn.textContent=(def>=0?'+':'')+def+' kcal';
+    const pct=Math.min(Math.max(def/1000,0),1)*100;
+    let col,bg,tc,tx;
+    if(def<0){col='#f87171';bg='#450a0a';tc='#f87171';tx='Eating more than burning — stop eating today'}
+    else if(def>1000){col='#fbbf24';bg='#451a03';tc='#fbbf24';tx='Too aggressive — risk losing muscle, eat more at dinner'}
+    else if(def>=500){col='#22c55e';bg='#14532d';tc='#22c55e';tx='Perfect deficit zone — you are right on track!'}
+    else{col='#f97316';bg='#431407';tc='#f97316';tx='Deficit too small — reduce dinner slightly'};
+    dn.style.color=col;df.style.width=pct+'%';df.style.background=col;
+    ds.style.background=bg;ds.style.color=tc;ds.textContent=tx;
+  }else{
+    dn.textContent='— kcal';dn.style.color='#a3a3a3';df.style.width='0%';
+    ds.style.background='#262626';ds.style.color='#a3a3a3';ds.textContent='Enter TDEE and calories eaten above';
   }
-};
-
-// ---- STATE ----
-let currentDay = 'training';
-let currentStratDay = 'training';
-let logData = { tdee: '', cal: '', protein: '', carbs: '', fat: '', fiber: '' };
-
-// ---- NAV ----
-function showPage(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ---- DAY TYPE ----
-function setDay(type, btn) {
-  currentDay = type;
-  btn.parentElement.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderDashboard();
-}
-
-function setStratDay(type, btn) {
-  currentStratDay = type;
-  btn.parentElement.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderStrategy();
-}
-
-// ---- RING ----
-function buildRing(val, max, color, label, unit) {
-  const pct = Math.min(val / max, 1);
-  const r = 34; const circ = 2 * Math.PI * r;
-  const dash = pct * circ;
-  const over = val > max;
-  const fc = over ? '#f87171' : color;
-  const left = over ? `+${val-max} over` : `${max-val} left`;
-  const leftColor = over ? '#f87171' : val/max > 0.85 ? '#22c55e' : val/max > 0.5 ? '#fbbf24' : '#404040';
-  return `
-    <div class="ring-card">
-      <div class="ring-wrap">
-        <svg width="84" height="84" viewBox="0 0 84 84">
-          <circle cx="42" cy="42" r="${r}" fill="none" stroke="#262626" stroke-width="7"/>
-          <circle cx="42" cy="42" r="${r}" fill="none" stroke="${fc}" stroke-width="7"
-            stroke-dasharray="${dash} ${circ}" stroke-linecap="round"
-            style="transition:stroke-dasharray 0.5s"/>
-        </svg>
-        <div class="ring-center">
-          <span class="ring-val" style="color:${fc}">${val}</span>
-          <span class="ring-unit">${unit}</span>
-        </div>
-      </div>
-      <div class="ring-info">
-        <div class="ring-name">${label}</div>
-        <div class="ring-target">Target: ${max}${unit}</div>
-        <div class="ring-left" style="color:${leftColor}">${val > 0 ? left : '—'}</div>
-      </div>
-    </div>`;
-}
-
-// ---- RENDER DASHBOARD ----
-function renderDashboard() {
-  const t = TARGETS[currentDay];
-  document.getElementById('cal-target').textContent = t.calories.toLocaleString();
-  document.getElementById('cal-sub').textContent = t.sub;
-  const grid = document.getElementById('rings-grid');
-  grid.innerHTML = MACROS.map(m => buildRing(0, t[m.key], m.color, m.label, 'g')).join('');
-}
-
-// ---- RENDER STRATEGY ----
-function renderStrategy() {
-  const s = STRATEGIES[currentStratDay];
-  document.getElementById('strat-meals').innerHTML =
-    `<div class="card-label">Meal Plan</div>` +
-    s.meals.map(m => `<div class="strategy-row">
-      <div class="strategy-time" style="background:${m.c}22;color:${m.c}">${m.time}</div>
-      <div class="strategy-text">${m.text}</div>
-    </div>`).join('');
-
-  document.getElementById('strat-schedule').innerHTML =
-    `<div class="card-label">Key Reminders</div>` +
-    s.schedule.map(m => `<div class="strategy-row">
-      <div class="strategy-time" style="background:${m.c}22;color:${m.c}">${m.time}</div>
-      <div class="strategy-text">${m.text}</div>
-    </div>`).join('');
-}
-
-// ---- RENDER LOG MACRO INPUTS ----
-function renderMacroInputs() {
-  document.getElementById('macro-inputs').innerHTML = MACROS.map(m => `
-    <div class="macro-input-row">
-      <div class="macro-dot" style="background:${m.color}"></div>
-      <div class="macro-input-label" style="color:${m.color}">${m.label}</div>
-      <input class="input-field" style="flex:1;font-size:15px;padding:10px 12px"
-        type="number" inputmode="numeric" id="in-${m.key}"
-        placeholder="g" oninput="recalc()">
-      <div class="macro-pct" id="pct-${m.key}" style="color:var(--dim)">—</div>
-    </div>`).join('');
-}
-
-// ---- RECALC ----
-function recalc() {
-  const tdee = parseInt(document.getElementById('in-tdee').value) || 0;
-  const cal  = parseInt(document.getElementById('in-cal').value)  || 0;
-  const deficit = tdee - cal;
-
-  // Deficit meter
-  const defNum = document.getElementById('def-num');
-  const defFill = document.getElementById('def-fill');
-  const defStatus = document.getElementById('def-status');
-
-  if (tdee && cal) {
-    defNum.textContent = (deficit >= 0 ? '+' : '') + deficit + ' kcal';
-    const pct = Math.min(Math.max(deficit / 1000, 0), 1) * 100;
-
-    let color, statusBg, statusColor, statusText;
-    if (deficit < 0) {
-      color = '#f87171'; statusBg = '#450a0a'; statusColor = '#f87171';
-      statusText = '🚨 Eating more than burning! Stop eating today.';
-    } else if (deficit > 1000) {
-      color = '#fbbf24'; statusBg = '#451a03'; statusColor = '#fbbf24';
-      statusText = '⚠️ Too aggressive — risk losing muscle. Eat more at dinner.';
-    } else if (deficit >= 500) {
-      color = '#22c55e'; statusBg = '#14532d'; statusColor = '#22c55e';
-      statusText = '✅ Perfect deficit zone! You are right on track.';
-    } else {
-      color = '#f97316'; statusBg = '#431407'; statusColor = '#f97316';
-      statusText = '⚡ Deficit too small. Reduce dinner slightly.';
-    }
-    defNum.style.color = color;
-    defFill.style.width = pct + '%';
-    defFill.style.background = color;
-    defStatus.style.background = statusBg;
-    defStatus.style.color = statusColor;
-    defStatus.textContent = statusText;
-  } else {
-    defNum.textContent = '— kcal';
-    defNum.style.color = 'var(--muted)';
-    defFill.style.width = '0%';
-    defFill.style.background = 'var(--dim)';
-    defStatus.style.background = 'var(--border)';
-    defStatus.style.color = 'var(--muted)';
-    defStatus.textContent = 'Enter your TDEE and calories eaten above';
-  }
-
-  // Macro pcts
-  const t = TARGETS[currentDay];
-  let anyMacro = false;
-  MACROS.forEach(m => {
-    const val = parseInt(document.getElementById('in-' + m.key)?.value) || 0;
-    const pctEl = document.getElementById('pct-' + m.key);
-    if (pctEl) {
-      if (val > 0) {
-        anyMacro = true;
-        const pct = Math.round((val / t[m.key]) * 100);
-        pctEl.textContent = pct + '%';
-        pctEl.style.color = pct >= 100 ? '#22c55e' : pct >= 70 ? '#fbbf24' : '#f87171';
-      } else {
-        pctEl.textContent = '—';
-        pctEl.style.color = 'var(--dim)';
-      }
-    }
+  const t=T[cday];let any=false;
+  M.forEach(m=>{
+    const v=parseInt(document.getElementById('in-'+m.k)?.value)||0,el=document.getElementById('pct-'+m.k),tgt=t[m.k==='protein'?'p':m.k==='carbs'?'c':m.k==='fat'?'f':'fi'];
+    if(el){if(v>0){any=true;const p=Math.round(v/tgt*100);el.textContent=p+'%';el.style.color=p>=100?'#22c55e':p>=70?'#fbbf24':'#f87171'}else{el.textContent='—';el.style.color='#404040'}}
   });
-
-  // Progress rings
-  const ps = document.getElementById('progress-section');
-  if (anyMacro) {
-    ps.style.display = 'block';
-    const pr = document.getElementById('progress-rings');
-    pr.innerHTML = MACROS.map(m => {
-      const val = parseInt(document.getElementById('in-' + m.key)?.value) || 0;
-      return buildRing(val, t[m.key], m.color, m.label, 'g');
-    }).join('');
-  } else {
-    ps.style.display = 'none';
-  }
+  const ps=document.getElementById('prog-section');
+  if(any){ps.style.display='block';document.getElementById('prog-rings').innerHTML=M.map(m=>{const v=parseInt(document.getElementById('in-'+m.k)?.value)||0,tgt=t[m.k==='protein'?'p':m.k==='carbs'?'c':m.k==='fat'?'f':'fi'];return ring(v,tgt,m.col,m.l)}).join('')}
+  else ps.style.display='none';
 }
 
-// ---- INIT ----
-renderDashboard();
+function loadURLParams(){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const map=[['tdee','in-tdee'],['cal','in-cal'],['protein','in-protein'],['carbs','in-carbs'],['fat','in-fat'],['fiber','in-fiber']];
+    let found=false;
+    map.forEach(([param,id])=>{
+      const val=params.get(param);
+      if(val!==null&&val!==''){
+        found=true;
+        const el=document.getElementById(id);
+        if(el){el.value=Math.round(parseFloat(val)||0);el.classList.add('prefilled')}
+      }
+    });
+    if(found){
+      document.getElementById('prefill-banner').style.display='flex';
+      document.getElementById('live-badge').style.display='inline-flex';
+      document.getElementById('log-badge').style.display='inline-flex';
+      document.getElementById('log-sub').textContent='Pre-filled from Apple Health via Shortcut';
+      recalc();
+      showPage('log',document.querySelectorAll('.nav-btn')[1]);
+    }
+  }catch(e){console.log('URL params:',e)}
+}
+
+renderDash();
 renderMacroInputs();
-renderStrategy();
+renderStrat();
+window.addEventListener('load',loadURLParams);
 </script>
 </body>
 </html>
