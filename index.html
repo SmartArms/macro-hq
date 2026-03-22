@@ -147,7 +147,7 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
     <div class="ob-title">Welcome to<br>Macro HQ</div>
     <div class="ob-sub">Your personal nutrition system. Let's set up your profile to calculate your exact targets — calories, protein, deficit and timeline to your goal.</div>
     <label class="ob-label">Your name</label>
-    <input class="ifield" id="ob-name" placeholder="e.g. Bharat" type="text">
+    <input class="ifield" id="ob-name" placeholder="e.g. John Doe" type="text">
     <label class="ob-label">Gender</label>
     <select class="ifield" id="ob-gender">
       <option value="male">Male</option>
@@ -511,9 +511,27 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
         <button class="btn small" onclick="flSearch()" style="margin-top:0;flex-shrink:0">Look up</button>
       </div>
     </div>
-    <div id="fl-not-found" style="display:none" class="card" style="background:var(--yellow-dim);border-color:var(--yellow)">
-      <div style="font-size:13px;color:var(--yellow)">Food not in database yet.</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">Go to the Claude chat and ask: <strong style="color:var(--text)">"Add [food name] to the calorie tracker"</strong> — Claude will give you the values!</div>
+    <div id="fl-not-found" style="display:none">
+      <div class="card" style="border-top:3px solid var(--yellow)">
+        <div style="font-size:13px;color:var(--yellow);font-weight:700;margin-bottom:4px">Food not in database yet</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Ask Claude for the macros then add below — saves permanently on your iPhone!</div>
+        <div class="clbl" style="color:var(--green)">Add custom food</div>
+        <input class="ifield" type="text" id="cf-name" placeholder="Food name (e.g. Avocado)">
+        <label style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;display:block">Values per 100g or 100ml</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:11px;color:var(--muted)">Calories (kcal)</label><input class="ifield" type="number" id="cf-cal" placeholder="e.g. 160" inputmode="decimal" style="margin-bottom:0"></div>
+          <div><label style="font-size:11px;color:var(--muted)">Protein (g)</label><input class="ifield" type="number" id="cf-protein" placeholder="e.g. 2" inputmode="decimal" style="margin-bottom:0"></div>
+          <div style="margin-top:8px"><label style="font-size:11px;color:var(--muted)">Carbs (g)</label><input class="ifield" type="number" id="cf-carbs" placeholder="e.g. 9" inputmode="decimal" style="margin-bottom:0"></div>
+          <div style="margin-top:8px"><label style="font-size:11px;color:var(--muted)">Fat (g)</label><input class="ifield" type="number" id="cf-fat" placeholder="e.g. 15" inputmode="decimal" style="margin-bottom:0"></div>
+          <div style="margin-top:8px"><label style="font-size:11px;color:var(--muted)">Fiber (g)</label><input class="ifield" type="number" id="cf-fiber" placeholder="e.g. 7" inputmode="decimal" style="margin-bottom:0"></div>
+          <div style="margin-top:8px"><label style="font-size:11px;color:var(--muted)">Unit</label><select class="ifield" id="cf-unit" style="margin-bottom:0"><option value="g">g (solid)</option><option value="ml">ml (liquid)</option></select></div>
+        </div>
+        <button class="btn green" onclick="flSaveCustom()" style="margin-top:12px">Save to my Foods</button>
+      </div>
+    </div>
+    <div id="fl-custom-foods-section" style="display:none">
+      <div class="clbl" style="padding:0 2px;margin-bottom:8px">My saved foods</div>
+      <div id="fl-custom-foods-list"></div>
     </div>
     <div id="fl-result" style="display:none"></div>
     <div id="fl-logged-section" style="display:none">
@@ -1234,24 +1252,83 @@ var FL_DB={
 var flLogged=[];
 var flCurrentFood=null;
 
+function flGetCustomDB(){return ld('customFoods',{})}
+
+function flSaveCustom(){
+  var name=document.getElementById('cf-name').value.trim().toLowerCase();
+  var cal=parseFloat(document.getElementById('cf-cal').value)||0;
+  var protein=parseFloat(document.getElementById('cf-protein').value)||0;
+  var carbs=parseFloat(document.getElementById('cf-carbs').value)||0;
+  var fat=parseFloat(document.getElementById('cf-fat').value)||0;
+  var fiber=parseFloat(document.getElementById('cf-fiber').value)||0;
+  var unit=document.getElementById('cf-unit').value;
+  if(!name||!cal){alert('Enter food name and calories');return}
+  var custom=flGetCustomDB();
+  custom[name]={cal:cal/100,protein:protein/100,carbs:carbs/100,fat:fat/100,fiber:fiber/100,unit:unit};
+  sv('customFoods',custom);
+  document.getElementById('fl-not-found').style.display='none';
+  ['cf-name','cf-cal','cf-protein','cf-carbs','cf-fat','cf-fiber'].forEach(function(id){var el=document.getElementById(id);if(el)el.value=''});
+  flRenderCustomFoods();
+  document.getElementById('fl-input').value=name;
+  flSearch();
+}
+
+function flDelCustom(name){
+  var custom=flGetCustomDB();
+  delete custom[name];
+  sv('customFoods',custom);
+  flRenderCustomFoods();
+}
+
+function flRenderCustomFoods(){
+  var custom=flGetCustomDB();
+  var keys=Object.keys(custom);
+  var sec=document.getElementById('fl-custom-foods-section');
+  var list=document.getElementById('fl-custom-foods-list');
+  if(!keys.length){if(sec)sec.style.display='none';return}
+  if(sec)sec.style.display='block';
+  if(list)list.innerHTML=keys.map(function(k){
+    var f=custom[k];
+    return '<div class="meal-item" style="border-left-color:#a78bfa">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+      '<div><div class="meal-name">'+k.charAt(0).toUpperCase()+k.slice(1)+'</div>'+
+      '<div class="meal-macros" style="margin-top:4px">'+
+      '<span style="color:#f97316">🔥'+(f.cal*100).toFixed(0)+' per 100'+f.unit+'</span>'+
+      '<span style="color:#f97316">P:'+(f.protein*100).toFixed(1)+'g</span>'+
+      '<span style="color:#60a5fa">C:'+(f.carbs*100).toFixed(1)+'g</span>'+
+      '<span style="color:#fbbf24">F:'+(f.fat*100).toFixed(1)+'g</span>'+
+      '</div></div>'+
+      '<button class="del-btn" onclick="flDelCustom(''+k.replace(/'/g,"\'")+'')" >&#x2715;</button>'+
+      '</div></div>';
+  }).join('');
+}
+
 function flSearch(){
   var q=document.getElementById('fl-input').value.trim().toLowerCase();
   if(!q)return;
   var match=null;
-  var keys=Object.keys(FL_DB);
-  for(var i=0;i<keys.length;i++){
-    if(keys[i]===q||keys[i].indexOf(q)!==-1||q.indexOf(keys[i])!==-1){match=keys[i];break}
+  var custom=flGetCustomDB();
+  var allKeys=Object.keys(FL_DB).concat(Object.keys(custom));
+  for(var i=0;i<allKeys.length;i++){
+    if(allKeys[i]===q||allKeys[i].indexOf(q)!==-1||q.indexOf(allKeys[i])!==-1){match=allKeys[i];break}
   }
   var nf=document.getElementById('fl-not-found');
   var res=document.getElementById('fl-result');
-  if(!match){nf.style.display='block';res.style.display='none';return}
+  if(!match){
+    nf.style.display='block';
+    var cfn=document.getElementById('cf-name');
+    if(cfn)cfn.value=document.getElementById('fl-input').value.trim();
+    res.style.display='none';
+    return;
+  }
   nf.style.display='none';
   flCurrentFood=match;
-  var f=FL_DB[match];
+  var f=FL_DB[match]||custom[match];
+  var isCustom=!!custom[match];
   res.style.display='block';
   res.innerHTML=
     '<div class="card" style="border-top:3px solid var(--orange)">'+
-    '<div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px">'+match.charAt(0).toUpperCase()+match.slice(1)+'</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-size:18px;font-weight:800;color:var(--text)">'+match.charAt(0).toUpperCase()+match.slice(1)+'</div>'+(isCustom?'<span class="badge orange">Custom</span>':'')+'</div>'+
     '<div style="font-size:12px;color:var(--muted);margin-bottom:12px">Per 1'+f.unit+'</div>'+
     '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px">'+
       '<div class="stat-card" style="padding:10px 6px;text-align:center"><div style="font-size:15px;font-weight:800;color:var(--orange)">'+f.cal.toFixed(2)+'</div><div style="font-size:10px;color:var(--muted)">kcal/'+f.unit+'</div></div>'+
@@ -1276,7 +1353,8 @@ function flSearch(){
 
 function flCalc(){
   if(!flCurrentFood)return;
-  var f=FL_DB[flCurrentFood];
+  var f=FL_DB[flCurrentFood]||(flGetCustomDB()[flCurrentFood]);
+  if(!f)return;
   var qty=parseFloat(document.getElementById('fl-qty').value)||0;
   if(qty<=0)return;
   var cal=Math.round(f.cal*qty);
@@ -1300,7 +1378,8 @@ function flCalc(){
 
 function flLogMeal(){
   if(!flCurrentFood)return;
-  var f=FL_DB[flCurrentFood];
+  var f=FL_DB[flCurrentFood]||(flGetCustomDB()[flCurrentFood]);
+  if(!f)return;
   var qty=parseFloat(document.getElementById('fl-qty').value)||0;
   if(qty<=0){alert('Enter a valid amount first');return}
   var name=flCurrentFood.charAt(0).toUpperCase()+flCurrentFood.slice(1)+' ('+qty+f.unit+')';
@@ -1316,7 +1395,8 @@ function flLogMeal(){
 
 function flAdd(){
   if(!flCurrentFood)return;
-  var f=FL_DB[flCurrentFood];
+  var f=FL_DB[flCurrentFood]||(flGetCustomDB()[flCurrentFood]);
+  if(!f)return;
   var qty=parseFloat(document.getElementById('fl-qty').value)||0;
   if(qty<=0){alert('Enter a valid amount');return}
   flLogged.push({
