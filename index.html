@@ -1224,15 +1224,29 @@ function doImport(){
     var data=JSON.parse(raw);
     if(!data.meals){alert('Invalid backup');return;}
     if(!confirm('Replace ALL current data with backup?'))return;
+    // Normalise meals — support both old format (protein/carbs/fat/fiber) and new (p/c/f/fi)
+    var meals=(data.meals||[]).map(function(m){
+      return{
+        id:m.id||Date.now(),
+        name:m.name||'Meal',
+        cal:m.cal||0,
+        p:m.p||m.protein||0,
+        c:m.c||m.carbs||0,
+        f:m.f||m.fat||0,
+        fi:m.fi||m.fiber||0,
+        date:m.date||new Date().toDateString(),
+        time:m.time||'12:00 PM'
+      };
+    });
     if(data.profile)S.set('profile',data.profile);
-    S.set('meals',data.meals||[]);
+    S.set('meals',meals);
     S.set('weights',data.weights||[]);
     S.set('templates',data.templates||[]);
     S.set('customFoods',data.customFoods||{});
     S.set('dayType',data.dayType||'training');
-    alert('Restored! '+data.meals.length+' meals restored.');
+    alert('Restored! '+meals.length+' meals and '+(data.weights||[]).length+' weight entries restored.');
     hideImport();location.reload();
-  }catch(e){alert('Could not read backup.');}
+  }catch(e){alert('Could not read backup. Error: '+e.message);}
 }
 
 function clearAll(){if(confirm('Clear ALL data? Export backup first!')){localStorage.clear();location.reload();}}
