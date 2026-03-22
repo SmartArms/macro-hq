@@ -155,7 +155,7 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
     <div class="ob-title">Welcome to Macro HQ</div>
     <div class="ob-sub">Your personal nutrition command centre. Let's set up your profile to calculate exact calorie targets, protein goals and your timeline to results.</div>
     <span class="ob-lbl">Your name</span>
-    <input class="ifield" id="ob-name" type="text" placeholder="e.g. Bharat">
+    <input class="ifield" id="ob-name" type="text" placeholder="e.g. John Doe">
     <span class="ob-lbl">Gender</span>
     <select class="ifield" id="ob-gender"><option value="male">Male</option><option value="female">Female</option></select>
     <span class="ob-lbl">Age</span>
@@ -236,15 +236,7 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
       <div class="hero-sub" id="h-sub">750 kcal deficit target</div>
     </div>
     <div class="rings" id="h-rings"></div>
-    <div class="card">
-      <div class="clbl" style="color:var(--blue)">Water today</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <div style="font-size:24px;font-weight:800;color:var(--blue)" id="w-count">0</div>
-        <div style="font-size:13px;color:var(--muted)">/ 8 glasses</div>
-      </div>
-      <div class="water-cups" id="w-cups"></div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px">Tap a glass to log. Each glass = 250ml.</div>
-    </div>
+
     <div class="card">
       <div class="clbl">Today summary</div>
       <div id="h-summary"><div class="empty">No meals logged yet.<br>Go to Log tab to add meals.</div></div>
@@ -600,7 +592,6 @@ function updateAll(){
   renderLogRings();
   renderMeals();
   renderTemplates();
-  renderWater();
   renderProfileTargets();
   renderWtHistory();
   renderCustomFoods();
