@@ -155,7 +155,7 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
     <div class="ob-title">Welcome to Macro HQ</div>
     <div class="ob-sub">Your personal nutrition command centre. Let's set up your profile to calculate exact calorie targets, protein goals and your timeline to results.</div>
     <span class="ob-lbl">Your name</span>
-    <input class="ifield" id="ob-name" type="text" placeholder="e.g. John Doe">
+    <input class="ifield" id="ob-name" type="text" placeholder="e.g. Bharat">
     <span class="ob-lbl">Gender</span>
     <select class="ifield" id="ob-gender"><option value="male">Male</option><option value="female">Female</option></select>
     <span class="ob-lbl">Age</span>
@@ -1199,7 +1199,12 @@ function loadURL(){
 }
 
 function doExport(){
-  var data={v:4,exported:new Date().toISOString(),profile:S.get('profile',null),meals:S.get('meals',[]),weights:S.get('weights',[]),templates:S.get('templates',[]),customFoods:S.get('customFoods',{}),dayType:S.get('dayType','training')};
+  var tdeeData={};
+  for(var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if(k&&k.indexOf('tdee_')===0) tdeeData[k]=localStorage.getItem(k);
+  }
+  var data={v:4,exported:new Date().toISOString(),profile:S.get('profile',null),meals:S.get('meals',[]),weights:S.get('weights',[]),templates:S.get('templates',[]),customFoods:S.get('customFoods',{}),dayType:S.get('dayType','training'),tdeeData:tdeeData};
   var el=document.getElementById('export-data'),sec=document.getElementById('export-section');
   if(el)el.value=JSON.stringify(data,null,2);
   if(sec){sec.style.display='block';sec.scrollIntoView({behavior:'smooth'});}
@@ -1224,15 +1229,48 @@ function doImport(){
     var data=JSON.parse(raw);
     if(!data.meals){alert('Invalid backup');return;}
     if(!confirm('Replace ALL current data with backup?'))return;
+    // Normalise meals — support both old format (protein/carbs/fat/fiber) and new (p/c/f/fi)
+    var meals=(data.meals||[]).map(function(m){
+      return{
+        id:m.id||Date.now(),
+        name:m.name||'Meal',
+        cal:m.cal||0,
+        p:m.p||m.protein||0,
+        c:m.c||m.carbs||0,
+        f:m.f||m.fat||0,
+        fi:m.fi||m.fiber||0,
+        date:m.date||new Date().toDateString(),
+        time:m.time||'12:00 PM'
+      };
+    });
     if(data.profile)S.set('profile',data.profile);
-    S.set('meals',data.meals||[]);
+    S.set('meals',meals);
     S.set('weights',data.weights||[]);
     S.set('templates',data.templates||[]);
     S.set('customFoods',data.customFoods||{});
     S.set('dayType',data.dayType||'training');
-    alert('Restored! '+data.meals.length+' meals restored.');
+    // Restore TDEE data if available
+    if(data.tdeeData){
+      Object.keys(data.tdeeData).forEach(function(k){
+        localStorage.setItem(k,data.tdeeData[k]);
+      });
+    } else {
+      // Old backup — calculate approximate TDEE from meals where possible
+      // Group meals by date and store a note that TDEE needs re-entry
+      var mealDates={};
+      meals.forEach(function(m){ mealDates[m.date]=true; });
+      Object.keys(mealDates).forEach(function(d){
+        if(!localStorage.getItem('tdee_'+d)){
+          // Store 0 so deficit shows as unknown rather than wrong value
+          localStorage.setItem('tdee_'+d,'0');
+        }
+      });
+    }
+    var msg='Restored! '+meals.length+' meals and '+(data.weights||[]).length+' weight entries.';
+    if(!data.tdeeData) msg+='\n\nNote: TDEE data not in this backup. Go to Log tab and enter your TDEE for each day to see accurate deficits.';
+    alert(msg);
     hideImport();location.reload();
-  }catch(e){alert('Could not read backup.');}
+  }catch(e){alert('Could not read backup. Error: '+e.message);}
 }
 
 function clearAll(){if(confirm('Clear ALL data? Export backup first!')){localStorage.clear();location.reload();}}
