@@ -400,7 +400,16 @@ textarea.ifield{resize:none;padding-top:12px;font-size:12px;font-family:monospac
         <div id="fd-total" class="meal-macros" style="font-size:14px"></div>
       </div>
       <div id="fd-logged-list"></div>
+      <button class="btn grn" onclick="fdLogAll()" style="margin-bottom:8px">Log as Meal</button>
       <button class="btn sec" onclick="fdClear()">Clear all</button>
+    </div>
+    <!-- Meal name modal -->
+    <div id="fd-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center">
+      <div style="background:var(--card);border-radius:var(--r) var(--r) 0 0;padding:24px;width:100%;max-width:500px">
+        <div class="clbl" style="color:var(--green)">Log as which meal?</div>
+        <div id="fd-modal-options"></div>
+        <button class="btn sec" onclick="fdCloseModal()" style="margin-top:8px">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1121,6 +1130,61 @@ function fdLogMeal(){
 }
 
 function fdRemove(id){fdLogged=fdLogged.filter(function(x){return x.id!==id;});fdRender();}
+function fdLogAll(){
+  if(!fdLogged.length){alert('Add foods to the tracker first');return;}
+  // Get already logged meal names for today
+  var todayMeals=S.get('meals',[]).filter(function(m){return m.date===new Date().toDateString();});
+  var loggedNames=todayMeals.map(function(m){return m.name.toLowerCase();});
+  var options=['Breakfast','Lunch','Dinner','Pre-workout','Post-workout','Snack','Other'];
+  var available=options.filter(function(o){return loggedNames.indexOf(o.toLowerCase())===-1;});
+  var modal=document.getElementById('fd-modal');
+  var opts=document.getElementById('fd-modal-options');
+  if(!modal||!opts)return;
+  // Build meal total
+  var tot=fdLogged.reduce(function(a,x){return{cal:a.cal+x.cal,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f,fi:a.fi+x.fi};},{cal:0,p:0,c:0,f:0,fi:0});
+  opts.innerHTML='<div class="meal-macros" style="margin-bottom:14px;font-size:13px">'+
+    '<span style="color:#f97316">'+tot.cal+' kcal</span>'+
+    '<span style="color:#f97316">P:'+tot.p.toFixed(1)+'g</span>'+
+    '<span style="color:#60a5fa">C:'+tot.c.toFixed(1)+'g</span>'+
+    '<span style="color:#fbbf24">F:'+tot.f.toFixed(1)+'g</span>'+
+    '<span style="color:#22c55e">Fi:'+tot.fi.toFixed(1)+'g</span>'+
+    '</div>'+
+    available.map(function(o){
+      return '<button class="btn sec" onclick="fdConfirmLog(this.dataset.meal)" data-meal="'+o+'" style="margin-bottom:8px;text-align:left;padding:12px 16px">'+o+'</button>';
+    }).join('')+
+    (available.length===0?'<div style="font-size:13px;color:var(--muted);padding:8px 0">All main meals already logged. Use Snack or Other.</div>':'');
+  modal.style.display='flex';
+}
+
+function fdConfirmLog(mealName){
+  if(!fdLogged.length)return;
+  var tot=fdLogged.reduce(function(a,x){return{cal:a.cal+x.cal,p:a.p+x.p,c:a.c+x.c,f:a.f+x.f,fi:a.fi+x.fi};},{cal:0,p:0,c:0,f:0,fi:0});
+  var meals=S.get('meals',[]);
+  meals.unshift({
+    id:Date.now(),
+    name:mealName,
+    cal:Math.round(tot.cal),
+    p:parseFloat(tot.p.toFixed(1)),
+    c:parseFloat(tot.c.toFixed(1)),
+    f:parseFloat(tot.f.toFixed(1)),
+    fi:parseFloat(tot.fi.toFixed(1)),
+    date:new Date().toDateString(),
+    time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})
+  });
+  S.set('meals',meals);
+  fdCloseModal();
+  fdClear();
+  renderHome();renderLogRings();renderMeals();recalc();
+  // Switch to log tab to confirm
+  navTo('log',document.querySelectorAll('.nb')[1]);
+  alert(mealName+' logged successfully!');
+}
+
+function fdCloseModal(){
+  var modal=document.getElementById('fd-modal');
+  if(modal)modal.style.display='none';
+}
+
 function fdClear(){fdLogged=[];fdRender();}
 
 function fdRender(){
